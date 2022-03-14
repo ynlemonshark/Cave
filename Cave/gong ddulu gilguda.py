@@ -1,3 +1,5 @@
+# 이거는 연우가 작업중인 겁니다.
+
 import pygame
 import sys
 from pygame.locals import QUIT
