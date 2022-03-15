@@ -18,9 +18,14 @@ def main():
     s_x = 50
     s_y = 50
     wid_b = 20
-    hei_b = 20
+    ORG_hei = 20
+    hei_b = ORG_hei
     FALL = True
+    MOVE = True
     vel = 10
+    acc = 1
+    max_vel = 20
+    bounce_rate = 0.8
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -30,14 +35,27 @@ def main():
             SURFACE.fill((255, 255, 0))
 
             pygame.draw.ellipse(SURFACE, gold, (s_x, s_y, wid_b,hei_b))
-            if FALL:
-                s_y += vel
+            if FALL and MOVE:
+
                 if (s_y + hei_b) >= SIZE_Y:
                     FALL = False
-            else:
-                s_y -= vel
+                    vel = (int) (vel * bounce_rate)
+                    if vel <= 0:
+                        MOVE = False
+                else:
+                    vel += acc
+                    if vel >= max_vel:
+                        vel = max_vel
+                s_y += vel
+            elif MOVE:
+
                 if s_y <= 0:
                     FALL = True
+                else:
+                    vel -= acc
+                    if vel < 0: FALL = True
+                s_y -= vel
+
             # if falling:
             #     acceleration += acceleration * gravity + gravity
             #     height -= acceleration
