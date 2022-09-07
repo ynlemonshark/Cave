@@ -2,7 +2,7 @@ import sys
 import math
 import random
 import pygame
-from pygame.locals import QUIT, KEYDOWN, K_LEFT, K_RIGHT, K_SPACE, Rect
+from pygame.locals import QUIT, KEYDOWN, K_LEFT, K_RIGHT, K_SPACE, Rect, K_UP
 
 class Flag:
     def __init__(self):
@@ -14,6 +14,14 @@ class Flag:
         self.point = 10
         self.stage = 1
         self.sec = 0
+        self.shotready = 1
+class Arrow:
+    def __init__(self,rect,speed= 0):
+        self.rect = rect
+    def move(self):
+        self.rect.centery -= 10
+    def draw(self):
+        pygame.draw.rect(SURFACE, (255, 0, 0), self.rect)
 
 class Ddong:
     def __init__(self,rect,speed = 0):
@@ -57,10 +65,15 @@ def tick():
             elif event.key == K_RIGHT:
                 if HUMAN.rect[0] < (600-30):
                     HUMAN.rect.centerx += 2
+            elif event.key == K_UP:
+                if FLAG.shotready == 1:
+                    ARROWS.append(Arrow(Rect(HUMAN.rect[0],HUMAN.rect[1],10,10),5))
+                    FLAG.shotready = 0
             elif event.key == K_SPACE:
                 FLAG.standby = 0
                 FLAG.__init__()
                 print("start game")
+
     for idx, dd in enumerate(DDONGS):
         dd.move()
         if dd.rect.centery > 800:
@@ -68,17 +81,31 @@ def tick():
             if FLAG.collide == 0:
                 FLAG.score += FLAG.point
 
+    for idx, aa in enumerate(ARROWS):
+        aa.move()
+        if aa.rect.centery < 300:
+            del ARROWS[idx]
+
+
+
     if len(DDONGS) < FLAG.ddongCnt:
-        DDONGS.append(Ddong(Rect(random.randint(0, 600), 100, 3, 3), random.randint(3,10)))
+        DDONGS.append(Ddong(Rect(random.randint(0, 600), 100, 10, 10), random.randint(3,10)))
 
 
     #dCnt = len(DDONGS)
     #tmp = [x for x in DDONGS if not x.rect.colliderrect]
-    for x in DDONGS:
+    for idx, x in enumerate(DDONGS):
         if x.rect.colliderect(HUMAN.rect):
             #print("wag~~")
             FLAG.collide = 1
             break
+        for ida, a in enumerate(ARROWS):
+            if a.rect.colliderect(x.rect):
+                print("ok")
+                del ARROWS[ida]
+                print("del arrows")
+                del DDONGS[idx]
+
 
 
 
@@ -91,8 +118,9 @@ SURFACE = pygame.display.set_mode((600, 800))
 FPSCLOCK = pygame.time.Clock()
 BLOCKS = []
 DDONGS = []
+ARROWS = []
 #for i in range(0,5):
-DDONGS.append(Ddong(Rect(random.randint(0,600),100,20,10),5))
+DDONGS.append(Ddong(Rect(random.randint(0,600),100,10,10),5))
 #DD = Ddong(Rect(100,100,100,30),5)
 HUMAN = Human(Rect(300,750,25,25))
 def main():
@@ -116,6 +144,8 @@ def main():
 #                DDONGS.append(Ddong(Rect(random.randint(0, 600), 100, 3, 3), random.randint(3,10)))
             cnt = 0
             FLAG.sec += 1
+            if FLAG.shotready == 0:
+                FLAG.shotready = 1
         if (FLAG.sec == 10) and (FLAG.collide == 0):
 
             FLAG.ddongCnt += 20
@@ -142,8 +172,9 @@ def main():
 #        DD.move()
 #        DD.draw()
         for dd in DDONGS:
-
             dd.draw()
+        for aa in ARROWS:
+            aa.draw()
 
         if FLAG.collide == 1:
             SURFACE.blit(mess_over,(120,300))

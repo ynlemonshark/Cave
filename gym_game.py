@@ -1,61 +1,44 @@
-# q_learning.py
-
 import gym
-import numpy as np
-import matplotlib.pyplot as plt
 from gym.envs.registration import register
-import random as pr
+import readchar
+
+
+LEFT = 0
+DOWN = 1
+RIGHT = 2
+UP = 3
+
+arrow_keys = {
+    '\x1b[A' : UP,
+    '\x1b[B' : DOWN,
+    '\x1b[C' : RIGHT,
+    '\x1b[D' : LEFT
+}
+
 
 register(
     id='FrozenLake-v3',
-    entry_point='gym.envs.toy_text:FrozenLakeEnv',
-    kwargs={'map_name': '4x4',
-            'is_slippery': False}
-)
+    entry_point="gym.envs.toy_text:FrozenLakeEnv",
+    kwargs={'map_name':'4x4','is_slippery':False})
 
-env = gym.make('FrozenLake-v3')
 
-# Initialize table with all zeros
-Q = np.zeros([env.observation_space.n, env.action_space.n])
+'''여기서부터 gym 코드의 시작이다. env 는 agent 가 활동할 수 있는 environment 이다.'''
 
-'''1. Q 값이 업데이트될 때 maxQ(s',a') 에 곱할 감마 값을 설정한다.'''
-dis = .99
+env = gym.make("FrozenLake-v3")
+env.render() #환경을 화면으로 출력
 
-num_episodes = 2000
-
-# create lists to contain total rewards and steps per episode
-rList = []
-for i in range(num_episodes):
-    # Reset environment and get first new observation
-    state = env.reset()
-    rAll = 0
-    done = False
-
-    '''2. E-Greedy 를 위한 확률값을 만들어준다. (step i이 지남에 따라 decay 되도록 설정)'''
-    e = 1. / ((i // 100) + 1)
-
-    # The Q-Table learning algorithm : 한번 수행할 때 마다 Q 한칸 업데이트
-    while not done:
-
-        '''E-Greedy 를 따라 작은 확률로 랜덤하게 가고, 큰 확률로 높은 Q 를 따르는 쪽으로 간다.'''
-        if np.random.rand(1) < e:
-            action = env.action_space.sample()
-        else:
-            action = np.argmax(Q[state, :])
-
-        # Get new state and reward from environment
-        new_state, reward, done, _ = env.step(action)
-
-        # Update Q-Table with new knowledge using learning rate
-        Q[state, action] = reward + dis * np.max(Q[new_state, :])
-
-        rAll += reward
-        state = new_state
-
-    rList.append(rAll)
-
-print("Success rate: " + str(sum(rList) / num_episodes))
-print("Final Q-Table Values")
-print(Q)
-plt.bar(range(len(rList)), rList, color="blue")
-plt.show()
+while True:
+    key = readchar.readkey()  #키보드 입력을 받는다
+    print(key)
+    # if key not in arrow_keys.keys():
+    #     print("Game aborted!")
+    #     break
+    #
+    # action = arrow_keys[key] #에이젼트의 움직임
+    # state, reward, done, info = env.step(action) #움직임에 따른 결과값들
+    # env.render() #화면을 다시 출력
+    # print("State:", state, "Action", action, "Reward:", reward, "Info:", info)
+    #
+    # if done: #도착하면 게임을 끝낸다.
+    #     print("Finished with reward", reward)
+    #     break
