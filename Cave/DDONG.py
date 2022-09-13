@@ -34,7 +34,7 @@ class Ddong:
         self.rect.centery += self.speed
 
     def draw(self):
-        pygame.draw.rect(SURFACE, (255, 255, 0), self.rect)
+        pygame.draw.rect(SURFACE, (0, 0, 0), self.rect)
         SURFACE.blit(self.ship_image,self.rect[:2])
 
 class Human:
@@ -67,7 +67,7 @@ def tick():
                     HUMAN.rect.centerx += 2
             elif event.key == K_UP:
                 if FLAG.shotready == 1:
-                    ARROWS.append(Arrow(Rect(HUMAN.rect[0],HUMAN.rect[1],10,10),5))
+                    ARROWS.append(Arrow(Rect(HUMAN.rect[0],HUMAN.rect[1],50,10),5))
                     FLAG.shotready = 0
             elif event.key == K_SPACE:
                 FLAG.standby = 0
@@ -148,7 +148,7 @@ def main():
                 FLAG.shotready = 1
         if (FLAG.sec == 10) and (FLAG.collide == 0):
 
-            FLAG.ddongCnt += 20
+            FLAG.ddongCnt += 10
             FLAG.point += 2
             FLAG.stage += 1
             FLAG.sec = 0
